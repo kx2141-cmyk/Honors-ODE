@@ -1,0 +1,175 @@
+﻿Homework 2: Numerical Study of Self-Gravitating Ring Around a Central Mass
+
+
+Abstract: We simulate an (N+1) body system consisting of a central mass M and a ring of N>2 identical masses m equally spaced on a circle of radius R. We implement two formulations: (i) the inertial frame with standard Newtonian gravity, and (ii) a uniformly rotating frame at angular speed {omega} that renders the rigidly rotating ring an equilibrium. We verify that the two approaches produce corresponding results. Furthermore we conduct an empirical stability as a function of M/m using the full nonlinear equations. The system includes small 3-D Gaussian perturbations. Results show agreement between frames, good energy behavior at small time steps, and a clear trend: larger M/m stabilizes the ring, whereas small M/m including M=0 leads to rapid dispersion and ejection events.
+
+
+
+
+1. Model and Equations
+1.1 Central mass M at the origin and N equal masses m positioned at angles {thetak} = 2pil/N on a circle of radius R in the xy plane:
+
+
+rk​(0)=(Rcosθk​,Rsinθk​,0),k=1,…,N.
+
+
+1.2 Small random velocity perturbations δvk are added to each ring mass, drawn iid from a 3-D gaussian with standard deviation {sigma} proportional to the equilibrium ring speed {vring}
+
+
+1.3 Gravitational forces: For positions ri\mathbf r_iri​, masses mim_imi​, and gravitational constant GGG, the acceleration on body iii is
+ai=G∑j≠imjrj−ri(∣rj−ri∣2+ϵ2)3/2,\mathbf a_i = G\sum_{j\ne i} m_j \frac{\mathbf r_j-\mathbf r_i}{\left(|\mathbf r_j-\mathbf r_i|^2+\epsilon^2\right)^{3/2}},ai​=Gj=i∑​mj​(∣rj​−ri​∣2+ϵ2)3/2rj​−ri​​,
+with a small Plummer softening ϵ≪R\epsilon \ll Rϵ≪R to avoid numerical singularities at close approach while leaving large-scale dynamics essentially unchanged.
+
+
+1.4 Equilibrium angular speed {omega}.
+Let that be the outward radial unit vector at some ring mass. We compute the total gravitational acceleration on a on that mass from both the central mass and all other ring masses, then take the inward radial component
+        ain​=−a⋅r^.
+The equilibrium angular speed that balances gravity with centrifugal force is
+ Ω=ainR ,vring=ΩR.\boxed{\ \Omega = \sqrt{\frac{a_\text{in}}{R}}\ }, \qquad v_\text{ring}=\Omega R. Ω=Rain​​​ ​,vring​=ΩR.
+In the inertial frame we set ring velocities to vring ϕ^v_\text{ring}\,\hat{\boldsymbol\phi}vring​ϕ^​ (tangential). In the rotating frame at Ωz^\Omega\hat zΩz^, the equilibrium ring has zero velocity.
+1.5 Inertial vs Rotating frames
+Inertial frame (standard N+1N+1N+1 body):
+ r˙i=vi,v˙i=ai(r).\dot{\mathbf r}_i=\mathbf v_i,\qquad \dot{\mathbf v}_i=\mathbf a_i(\mathbf r).r˙i​=vi​,v˙i​=ai​(r).
+Rotating frame (constant Ω=Ωz^\boldsymbol\Omega=\Omega\hat zΩ=Ωz^):
+ r˙i=vi,v˙i=ai(r)  −  2 Ω×vi  −  Ω×(Ω×ri).\dot{\mathbf r}_i=\mathbf v_i,\quad \dot{\mathbf v}_i=\mathbf a_i(\mathbf r)\;-\;2\,\boldsymbol\Omega\times \mathbf v_i\;-\;\boldsymbol\Omega\times(\boldsymbol\Omega\times \mathbf r_i).r˙i​=vi​,v˙i​=ai​(r)−2Ω×vi​−Ω×(Ω×ri​).
+(No Euler term since Ω\OmegaΩ is constant.) For comparisons, we convert rotating-frame states back to inertial via
+v(inertial)=v(rot)+Ω×r,r(inertial)=Rz(Ωt) r(rot).\mathbf v^{(\text{inertial})}=\mathbf v^{(\text{rot})}+ \boldsymbol\Omega \times \mathbf r,\quad \mathbf r^{(\text{inertial})}=R_z(\Omega t)\,\mathbf r^{(\text{rot})}.v(inertial)=v(rot)+Ω×r,r(inertial)=Rz​(Ωt)r(rot).
+
+
+2. Numerical Method
+2.1 Time Integrator
+We use velocity verlet, a second order symplectic method that handles the rotating-frame extra terms by evaluating accelerations as functions of (r, v)
+2.2 Units and Parameters
+We non-dimensionalize so that G=1 and choose R = 1, m = 1. The ration M/m is varied in the stability study. Softening of order epsilon = 10^-3 R is used and we choose a time step delta t as a fraction of the orbital period T = 2pi/{omega}. (Chose 2000-5000 steps per orbit). Random velocity kicks use sigma = alpha*vring with alpha about 10^-2
+2.3 Diagnostics and Plots
+Total mechanical energy in the inertial frame:
+E(t)=∑i12mi∥vi(inertial)∥2  −  ∑i<jGmimj∣ri−rj∣2+ϵ2.E(t)=\sum_i \tfrac12 m_i \|\mathbf v_i^{(\text{inertial})}\|^2 \;-\; \sum_{i<j}\frac{G m_i m_j}{\sqrt{|\mathbf r_i-\mathbf r_j|^2+\epsilon^2}}.E(t)=i∑​21​mi​∥vi(inertial)​∥2−i<j∑​∣ri​−rj​∣2+ϵ2​Gmi​mj​​.
+(For the rotating run we convert velocities to inertial before evaluating EEE.
+Time step halving: we repeat a run with deltat / 2 and compare trajectories and energies over the same time window.
+Ring Radial dispersion: Std{∣rk​∣}k∈ring​.
+Out of plane measure RMSk​{zk​} over ring masses
+Minimum pairwise distance (all bodies) to detect near-collisions
+COM removeal for plotting: we also visualize trajectories in the center-of-mass frame to separate bulk drift from true uounded motion
+
+
+3. Experiments
+3.1 Baseline Run
+Parameters (representative): N=9N=9N=9, M/m=10M/m=10M/m=10, R=1R=1R=1, G=1G=1G=1, ϵ=10−3R\epsilon=10^{-3}Rϵ=10−3R, α=0.01\alpha=0.01α=0.01, 505050 orbits, ≈2000\approx 2000≈2000–500050005000 steps/orbit.
+
+
+
+
+  
+
+
+
+
+
+  
+
+Top view of N=4 (simulation turns off at t=50, thus resulting in the ejections you see)
+  
+
+N = 4
+Figure 1:  Inertial trajectories (3-D) with the COM subtracted show bounded, nearly circular/rosette paths with small epicycles
+  
+
+n=9
+  
+
+Fig. 2: Rotating-frame solution converted back to inertial coordinates overlays the inertial run closely (solid vs. dashed), demonstrating frame equivalence.
+  
+
+Fig. 3: Total inertial energy vs. time is essentially flat in both runs; relative drift ≲10−4\lesssim 10^{-4}≲10−4–10−310^{-3}10−3 over 50 orbits (depends on Δt\Delta tΔt and ϵ\epsilonϵ).
+
+
+  
+
+Fig. 4: Radial dispersion of the ring remains small and roughly constant. Of dt/2 vs dt /4
+  
+
+
+
+  
+
+
+
+Fig. 5: RMS zzz (out-of-plane) remains tiny; no vertical instability in this regime.
+  
+
+
+Fig. 6: Minimum pair distance stays well above ϵ\epsilonϵ; no near-collisions
+
+
+
+
+
+
+Conclusion: With a correctly computed Ω\OmegaΩ and adequate resolution, the two formulations produce corresponding dynamics, confirming the implementation.
+
+
+
+
+
+
+3.2 Time-step sensitivity
+
+
+
+
+  
+
+dt/4
+  
+
+dr/2
+Fig. 7: RMS trajectory difference between Δt\Delta tΔt and Δt/2\Delta t/2Δt/2 (interpolated to the same times) remains small and decreases with refinement, indicating the baseline Δt\Delta tΔt is in the converged regime. 
+dt/4 sits well below dt/2 by a factor of about 4
+
+
+3.3 Empirical stability vs M/m
+We scan M/m∈{0,0.5,1,3,10,30,100}M/m \in \{0, 0.5, 1, 3, 10, 30, 100\}M/m∈{0,0.5,1,3,10,30,100} for N=9N=9N=9 over 20 orbits using identical perturbation amplitude α\alphaα and steps/orbit. As a scalar stability metric, we report the growth factor of radial dispersion: γ=Stdfinal/Stdinitial\gamma = \text{Std}_\text{final}/\text{Std}_\text{initial}γ=Stdfinal​/Stdinitial​.
+  
+
+Fig. 8: γ\gammaγ vs M/mM/mM/m (log-scale on γ\gammaγ). Trend:
+
+   * M=0M=0M=0: rapid breakup (γ≫1\gamma \gg 1γ≫1); the ring disperses and bodies are frequently ejected (positive total energy after close encounters).
+
+   * Small M/mM/mM/m (≈ 0.5−30.5{-}30.5−3): strong broadening; unstable.
+
+   * Moderate–large M/mM/mM/m (≈ 10−10010{-}10010−100): ring is robust; γ≈1\gamma \approx 1γ≈1.
+
+This supports the intuitive picture that a sufficiently massive central potential suppresses phase mixing and clumping driven by ring self-gravity and perturbations
+
+
+
+
+
+
+
+
+5. Interpretation and Discussion
+   1. Equilibrium meaning: Inertial runs with no random kicks (α=0\alpha=0α=0) and correctly computed Ω\OmegaΩ yield orbits at constant radius RRR. In the rotating frame, the same state is a fixed point. With small kicks, trajectories remain bounded and near-circular; in the inertial frame they need not be closed (mutual gravity induces precession and small rosettes).
+
+   2. Diagnosing “escape to infinity”: Apparent straight-line “escapes” usually reflect COM drift in the plot or insufficient resolution. True physical ejection appears when small M/mM/mM/m allows close encounters to transfer enough energy to make a body’s inertial energy positive. Our COM-frame plots and energy curves distinguish numerical artifacts from physical instability.
+
+   3. Softening and resolution: Too small ϵ\epsilonϵ with too large Δt\Delta tΔt creates spurious heating at close approach; too large ϵ\epsilonϵ over-smooths the physics. Values near 10−3R10^{-3}R10−3R with ≳2000\gtrsim 2000≳2000 steps/orbit worked well here.
+
+   4. Out-of-plane dynamics: For our perturbation magnitudes, vertical modes stayed small for M/m≳10M/m\gtrsim 10M/m≳10. Larger kicks or different NNN can trigger bending-like behavior; RMS zzz is the right diagnostic.
+
+
+
+
+7. Conclusions
+We built and validated two consistent numerical formulations for a self-gravitating ring around a central mass. Agreement between inertial and rotating-frame simulations (after coordinate/velocity conversion), strong energy conservation, and time-step convergence confirm the correctness of the implementation. The empirical sweep over M/mM/mM/m shows that a sufficiently massive central body stabilizes the ring against its self-gravity: for M/m≳10M/m \gtrsim 10M/m≳10 (with N=9N=9N=9 and small perturbations), the ring remains tight and planar; for small M/mM/mM/m, the configuration is unstable, with rapid radial dispersion and common ejections. These findings match physical expectations and illustrate the importance of frame choice, initialization (especially Ω\OmegaΩ), and numerical resolution when diagnosing stability in NNN-body problems.
+
+
+
+
+
+
+  
+
+
+
+(This just looks cool)
